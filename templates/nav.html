@@ -1,0 +1,11 @@
+<h1>Cars API Django</h1>
+<button class="btn btn-primary" onclick="location.href='{% url 'cars' %}'">List all cars</button>
+<button class="btn btn-success" onclick="location.href='{% url 'populars' %}'">Most popular cars</button>
+<button class="btn btn-warning" onclick="location.href='{% url 'add' %}'">Add car</button>
+<br/>
+<br/>
+{% if message %}
+    <b> {{ message }} </b>
+    <br/>
+    <br/>
+{% endif %}

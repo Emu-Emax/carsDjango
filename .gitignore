@@ -1,0 +1,16 @@
+.idea
+# coverage
+.coverage
+.DS_Store
+
+# database
+*.db
+*.rdb
+*.ipynb
+db.*
+
+# other
+*~
+*/*~
+*.pyc
+*.log

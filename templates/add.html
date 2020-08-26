@@ -1,0 +1,23 @@
+{% extends 'home.html' %}
+{% block main %}
+    <i>Search in
+        <a href="https://vpic.nhtsa.dot.gov/api">
+            external API
+        </a>
+        for car with given make/model combination (first for make, then, for models). If exists, update database with new car.
+    Example: make: HONDA , model: Odyssey
+    </i>
+    <br />
+    <br />
+    <form action="/cars/" method="post">
+        {% csrf_token %}
+    <label for="make">Make: </label>        <br />
+    <input id="make" type="text" name="make" value="">
+                <br />
+        <label for="model">Model: </label>        <br />
+
+    <input id="model" type="text" name="model" value="">
+                <br />        <br />
+    <input class="btn btn-primary" type="submit" value="Add">
+    </form>
+{% endblock %}

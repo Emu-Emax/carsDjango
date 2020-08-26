@@ -1,0 +1,29 @@
+{% extends 'home.html' %}
+{% block main %}
+        <i>Lists all cars ordered by their popularity (number of votes)</i>
+    <br />
+    <br />
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Make</th>
+            <th scope="col">Model</th>
+            <th scope="col">Votes</th>
+        </tr>
+        </thead>
+        <tbody>
+        <form action="/rate/" method="post">
+        {% for car in cars %}
+            <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ car.make }}</td>
+                <td>{{ car.model }}</td>
+                <td>{{ car.votes }}</td>
+            </tr>
+        {% endfor %}
+        </form>
+        </tbody>
+    </table>
+
+{% endblock %}
