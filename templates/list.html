@@ -20,27 +20,27 @@
             <input type="hidden" id="rate" name="rate">
             {% csrf_token %}
         </form>
-        {% for car in cars %}
-            <tr>
-                <th scope="row">{{ forloop.counter }}</th>
-                <td>{{ car.make }}</td>
-                <td>{{ car.model }}</td>
-                <td>{{ car.average }}</td>
-
-                <td>
-                    <select class="form-control" id="selectForm{{ car.pk }}" name="rate">
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
-                        <option>5</option>
-                    </select>
-                </td>
-                <td>
-                    <button class="btn btn-success" onClick="handleVote({{ car.pk }})">Vote</button>
-                </td>
-            </tr>
-        {% endfor %}
+{#        {% for car in cars %}#}
+{#            <tr>#}
+{#                <th scope="row">{{ forloop.counter }}</th>#}
+{#                <td>{{ car.make }}</td>#}
+{#                <td>{{ car.model }}</td>#}
+{#                <td>{{ car.average }}</td>#}
+{##}
+{#                <td>#}
+{#                    <select class="form-control" id="selectForm{{ car.pk }}" name="rate">#}
+{#                        <option>1</option>#}
+{#                        <option>2</option>#}
+{#                        <option>3</option>#}
+{#                        <option>4</option>#}
+{#                        <option>5</option>#}
+{#                    </select>#}
+{#                </td>#}
+{#                <td>#}
+{#                    <button class="btn btn-success" onClick="handleVote({{ car.pk }})">Vote</button>#}
+{#                </td>#}
+{#            </tr>#}
+{#        {% endfor %}#}
         </tbody>
     </table>
 

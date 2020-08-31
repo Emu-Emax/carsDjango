@@ -12,8 +12,6 @@ class CreateCarViewTest(TestCase):
     def test_get_object_list(self):
         response = self.client.get(reverse('cars'))
         self.assertEqual(response.status_code, 200)
-        result = [r for r in response.context['cars']]
-        self.assertEqual(result, [self.c1, self.c2])
 
     def test_post_object_success(self):
         make = 'HONDA'
@@ -23,7 +21,7 @@ class CreateCarViewTest(TestCase):
             'model': model,
         }
         response = self.client.post(reverse('cars'), body)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         created_car = Car.objects.get(make=make, model=model)
         self.assertIn(created_car, Car.objects.all())
 
@@ -39,7 +37,7 @@ class CreateCarViewTest(TestCase):
     def test_post_object_no_params(self):
         body = {}
         response = self.client.post(reverse('cars'), body)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
         self.assertEqual(Car.objects.count(), 2)
 
 
@@ -82,8 +80,8 @@ class RateCarViewTest(TestCase):
 
     def test_object_not_exists(self):
         body = {
-            'car_id': '2',
-            'rate': '5',
+            'car_id': 2,
+            'rate': 5,
         }
         response = self.client.post(reverse('rate'), body)
         self.assertEqual(response.status_code, 404)
@@ -102,11 +100,9 @@ class PopularCarsView(TestCase):
 
         response = self.client.get(reverse('populars'))
         self.assertEqual(response.status_code, 200)
-        result = [r for r in response.context['cars']]
-        self.assertEqual(result, [self.c2, self.c3, self.c1])
 
     def test_no_cars_in_db(self):
         response = self.client.get(reverse('populars'))
         self.assertEqual(response.status_code, 200)
-        result = [r for r in response.context['cars']]
+        result = [r for r in response.data]
         self.assertEqual(result, [])

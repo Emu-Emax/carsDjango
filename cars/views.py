@@ -1,9 +1,11 @@
-import requests
-from django.http import HttpResponse
 from django.shortcuts import render
-from django.views import View
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 from .models import Car
+from .services import fetch_car_models
+from .serializers import CarSerializer
+from rest_framework import generics, status
 
 
 def index(request):
@@ -21,58 +23,53 @@ def render_add_template(request, msg='', status=200):
     return render(request, 'add.html', context=context, status=status)
 
 
-class CreateCarView(View):
-
-    def fetch_car_makes(self):
-        makes = requests.get('https://vpic.nhtsa.dot.gov/api/vehicles/getallmakes?format=json')
-        makes_json = makes.json()
-        return makes_json['Results']
-
-    def fetch_car_models(self, car_make):
-        models = requests.get('https://vpic.nhtsa.dot.gov/api/vehicles/getmodelsformake/' + car_make + '?format=json')
-        models_json = models.json()
-        return models_json['Results']
+class CreateCarView(APIView):
 
     def get(self, request):
-        return render_list_cars(request, msg='')
+        cars_serializer = CarSerializer(Car.objects.all(), many=True)
+        return Response(cars_serializer.data)
 
     def post(self, request, *args, **kwargs):
+        cars_serializer = CarSerializer(data=request.data)
+
         car_make = str.upper(request.POST.get('make', '')).rstrip()
         car_model = request.POST.get('model', '').rstrip()
-        car_makes = self.fetch_car_makes()
 
-        for m in car_makes:
-            if car_make == m['Make_Name'].rstrip():
-                car_models = self.fetch_car_models(car_make)
+        if car_make:
+            car_models = fetch_car_models(car_make)
 
-                for car in car_models:
-                    if car['Model_Name'].rstrip() == car_model:
-                        Car.objects.get_or_create(make=car_make, model=car_model)
-                        return render_add_template(request, 'Database updated with new car!')
+            for car in car_models:
+                if car['Model_Name'].rstrip() == car_model and cars_serializer.is_valid():
+                    cars_serializer.save()
+                    return Response(cars_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        return render_add_template(request, 'Car does not exist!', status=404)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-class RateCarView(View):
+class RateCarView(APIView):
     def post(self, request, *args, **kwargs):
         car_id = request.POST.get('car_id', '')
         rate = request.POST.get('rate', '')
 
         if not car_id.isnumeric() or not rate.isnumeric():
-            return HttpResponse(status=400)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
         if int(rate) not in [1, 2, 3, 4, 5]:
-            return HttpResponse(status=400)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
         try:
             car = Car.objects.get(pk=car_id)
             car.upvote(int(rate))
-            return render_list_cars(request, msg='Voted for a car!')
+            return Response('Voted for a car', status=status.HTTP_200_OK)
         except Car.DoesNotExist:
-            return render_list_cars(request, msg='Car does not exist!', status=404)
+            return Response('Car not found', status=status.HTTP_404_NOT_FOUND)
 
 
-class PopularCarsView(View):
-    def get(self, request):
-        cars = Car.objects.filter_by_popularity()
-        return render(request, 'populars.html', context={'cars': cars})
+class PopularCarsView(generics.ListAPIView):
+    serializer_class = CarSerializer
+
+    def get_queryset(self):
+        qs = Car.objects.filter_by_popularity()
+        return qs

@@ -14,3 +14,6 @@ db.*
 */*~
 *.pyc
 *.log
+
+#env
+Pipfile
