@@ -12,13 +12,13 @@ def index(request):
     return render(request, 'home.html')
 
 
-def render_list_cars(request, msg, status=200):
+def render_list_cars(request, msg, status=status.HTTP_200_OK):
     cars = Car.objects.all()
     context = {'cars': cars, 'message': msg}
     return render(request, 'list.html', context=context, status=status)
 
 
-def render_add_template(request, msg='', status=200):
+def render_add_template(request, msg='', status=status.HTTP_200_OK):
     context = {'message': msg}
     return render(request, 'add.html', context=context, status=status)
 
